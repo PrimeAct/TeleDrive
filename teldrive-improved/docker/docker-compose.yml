@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  teldrive:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: teldrive
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - TELDRIVE_DB_HOST=postgres
+      - TELDRIVE_DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - TELDRIVE_REDIS_ENABLED=true
+      - TELDRIVE_REDIS_ADDRESS=redis:6379
+      - TELDRIVE_LOG_LEVEL=info
+    volumes:
+      - teldrive-data:/data
+      - ./config.toml:/etc/teldrive/config.toml:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "/teldrive", "version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: teldrive-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_NAME:-teldrive}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: teldrive-cache
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  teldrive-data:
+  postgres-data:
+  redis-data:

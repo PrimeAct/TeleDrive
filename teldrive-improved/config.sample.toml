@@ -1,0 +1,82 @@
+[server]
+host = "0.0.0.0"
+port = 8080
+auto-port = false
+read-timeout = "30s"
+write-timeout = "30s"
+idle-timeout = "120s"
+
+[server.cors]
+enabled = true
+allowed-origins = ["*"]
+allowed-methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+allowed-headers = ["*"]
+allow-credentials = true
+max-age = "24h"
+
+[log]
+level = "info"
+format = "json"
+output = "stdout"
+max-size = 100
+max-backups = 5
+max-age = 30
+compress = true
+
+[jwt]
+secret = ""
+session-time = "720h"
+allowed-users = []
+
+[db]
+host = "localhost"
+port = 5432
+user = "postgres"
+password = "postgres"
+name = "teldrive"
+ssl-mode = "disable"
+
+[db.pool]
+max-open = 25
+max-idle = 5
+max-lifetime = "1h"
+max-idle-time = "30m"
+
+[tg]
+app-id = 0
+app-hash = ""
+phone = ""
+password = ""
+session-dir = "./sessions"
+workers = 4
+multi-bots = []
+upload-pool-size = 50
+download-pool-size = 50
+
+[tg.proxy]
+enabled = false
+url = ""
+username = ""
+password = ""
+
+[cron-jobs]
+enabled = true
+cleanup-interval = "24h"
+stats-interval = "1h"
+
+[cache]
+type = "memory"
+ttl = "5m"
+max-size = 10000
+
+[redis]
+enabled = false
+address = "localhost:6379"
+password = ""
+db = 0
+
+[events]
+poll-interval = "10s"
+db-workers = 10
+db-buffer-size = 1000
+deduplication-ttl = "5s"
